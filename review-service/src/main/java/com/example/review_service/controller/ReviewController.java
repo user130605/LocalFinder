@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/review-service")
 public class ReviewController {
 
-    @GetMapping("/review-service")
+    @GetMapping("/welcome")
     public String welcome(){
         return "review-service 입니다.";
     }
