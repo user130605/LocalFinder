@@ -13,6 +13,16 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  datasource:
+    url: jdbc:mysql://localhost:3306/localfinder
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+      hibernate:
+        ddl-auto: update # (기존 테이블이 있으니까 validate 또는 none 추천)
+      show-sql: true
+      database-platform: org.hibernate.dialect.MySQL8Dialect
 
 eureka:
   instance:
