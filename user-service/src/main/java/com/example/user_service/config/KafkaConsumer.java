@@ -1,6 +1,6 @@
-package com.example.user_service.kafka;
+package com.example.user_service.config;
 
-import com.example.user_service.kafka.event.UserCreatedEvent;
+import com.example.user_service.event.UserCreatedEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

@@ -1,4 +1,4 @@
-package com.example.review_service.kafka;
+package com.example.user_service.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;

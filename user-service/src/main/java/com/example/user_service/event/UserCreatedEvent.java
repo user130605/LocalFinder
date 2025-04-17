@@ -1,4 +1,4 @@
-package com.example.user_service.kafka.event;
+package com.example.user_service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
