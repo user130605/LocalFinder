@@ -1,4 +1,4 @@
-package com.example.review_service.kafka.event;
+package com.example.review_service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

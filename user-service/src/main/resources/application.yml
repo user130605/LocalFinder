@@ -32,3 +32,10 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://127.0.0.1:8761/eureka
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method

@@ -3,7 +3,7 @@ package com.example.user_service.controller;
 import com.example.user_service.dto.UserDto;
 import com.example.user_service.jpa.UserEntity;
 import com.example.user_service.jpa.UserRepository;
-import com.example.user_service.kafka.KafkaProducer;
+import com.example.user_service.config.KafkaProducer;
 import com.example.user_service.service.UserService;
 import com.example.user_service.vo.RequestCreate;
 import com.example.user_service.vo.ResponseCreate;

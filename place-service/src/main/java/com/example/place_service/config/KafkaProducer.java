@@ -1,4 +1,4 @@
-package com.example.user_service.kafka;
+package com.example.place_service.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;

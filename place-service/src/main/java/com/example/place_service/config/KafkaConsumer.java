@@ -1,4 +1,4 @@
-package com.example.review_service.kafka;
+package com.example.place_service.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class KafkaConsumer {
 
-    @KafkaListener(topics = "user-created", groupId = "review-group")
+    @KafkaListener(topics = "topicName", groupId = "groupId")
     public void consume(String message) {
         log.info("Consumed message: {}", message);
     }
