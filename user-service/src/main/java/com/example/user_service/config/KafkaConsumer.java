@@ -1,14 +1,21 @@
 package com.example.user_service.config;
 
+import com.example.user_service.event.ReviewAddedEvent;
 import com.example.user_service.event.UserCreatedEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class KafkaConsumer {
+
+    @KafkaListener(topics = "review-added", groupId = "user-group", containerFactory = "kafkaListenerContainerFactory")
+    public void handleReviewAdded(@Payload ReviewAddedEvent event) {
+        log.info("Kafka message received: id={}, content={}", event.getReviewId(), event.getContent());
+    }
 
     @KafkaListener(topics = "topicName", groupId = "groupId")
     public void consume(String message) {

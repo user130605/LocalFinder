@@ -16,7 +16,6 @@ import java.util.concurrent.CompletableFuture;
 public class KafkaProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final ObjectMapper objectMapper;
 
     public void send(String topic, String message) {
         kafkaTemplate.send(topic, message);
@@ -32,8 +31,6 @@ public class KafkaProducer {
                 log.info("Kafka message sent: {}", result.getProducerRecord().value());
             }
         });
-
-
     }
 }
 
