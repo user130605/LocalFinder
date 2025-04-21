@@ -6,13 +6,23 @@ spring:
     name: place-service
   kafka:
     bootstrap-servers: localhost:9092
-    consumer:
-      group-id: place-service
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+
+    consumer:
+      group-id: review-service-group  # 서비스별로 다르게 설정
+      auto-offset-reset: earliest     # 가장 오래된 메시지부터 읽음
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"   # 또는 DTO가 있는 패키지명
+
+    listener:
+      missing-topics-fatal: false  # topic 없어도 앱 실행 가능하게
   datasource:
     url: jdbc:mysql://localhost:3306/localfinder
     username: root
