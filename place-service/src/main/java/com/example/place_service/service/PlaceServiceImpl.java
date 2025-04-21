@@ -1,6 +1,8 @@
 package com.example.place_service.service;
 
+import com.example.place_service.config.KafkaProducer;
 import com.example.place_service.dto.PlaceDto;
+import com.example.place_service.event.PlaceCreatedEvent;
 import com.example.place_service.jpa.PlaceEntity;
 import com.example.place_service.jpa.PlaceRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -11,16 +13,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class PlaceServiceImpl implements PlaceService{
     PlaceRepository placeRepository;
+    KafkaProducer kafkaProducer;
 
     @Autowired
-    public PlaceServiceImpl(PlaceRepository placeRepository) {
+    public PlaceServiceImpl(PlaceRepository placeRepository, KafkaProducer kafkaProducer) {
         this.placeRepository = placeRepository;
+        this.kafkaProducer = kafkaProducer;
     }
 
     @Override
@@ -31,6 +34,15 @@ public class PlaceServiceImpl implements PlaceService{
         PlaceEntity placeEntity = mapper.map(placeDto, PlaceEntity.class);
 
         placeRepository.save(placeEntity);
+
+        // Kafka 이벤트 발행
+        PlaceCreatedEvent event = PlaceCreatedEvent.builder()
+                .placeId(placeEntity.getId())
+                .name(placeEntity.getName())
+                .ownerId(placeEntity.getOwnerId())
+                .build();
+
+        kafkaProducer.sendPlaceCreatedEvent(event);
 
         return placeDto;
     }

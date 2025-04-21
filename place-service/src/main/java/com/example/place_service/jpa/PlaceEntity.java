@@ -31,5 +31,5 @@ public class PlaceEntity {
     private String phone;
 
     @Column(name = "owner_id", nullable = false)
-    private Integer ownerId;
+    private int ownerId;
 }
