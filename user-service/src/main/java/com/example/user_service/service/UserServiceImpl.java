@@ -1,6 +1,8 @@
 package com.example.user_service.service;
 
+import com.example.user_service.config.KafkaProducer;
 import com.example.user_service.dto.UserDto;
+import com.example.user_service.event.UserCreatedEvent;
 import com.example.user_service.jpa.UserEntity;
 import com.example.user_service.jpa.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,13 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService{
     @Autowired
     UserRepository userRepository;
+    KafkaProducer kafkaProducer;
+
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, KafkaProducer kafkaProducer) {
+        this.userRepository = userRepository;
+        this.kafkaProducer = kafkaProducer;
+    }
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -24,6 +33,15 @@ public class UserServiceImpl implements UserService{
         userEntity.setPassword("encryptedPassword");
 
         userRepository.save(userEntity);
+
+        // Kafka 이벤트 발행
+        UserCreatedEvent event = UserCreatedEvent.builder()
+                .userId(userEntity.getId())
+                .email(userEntity.getEmail())
+                .nickname(userEntity.getNickname())
+                .build();
+
+        kafkaProducer.sendUserCreatedEvent(event);
 
         return userDto;
     }
