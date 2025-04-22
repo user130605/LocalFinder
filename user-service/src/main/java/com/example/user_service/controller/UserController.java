@@ -51,11 +51,11 @@ public class UserController {
         return ResponseEntity.ok(responseCreate);
     }
 
-    @GetMapping("/send")
-    public String sendMessage(@RequestParam String message) {
-        kafkaProducer.send("user-created", message);
-        return "Sent to Kafka: " + message;
-    }
+//    @GetMapping("/send")
+//    public String sendMessage(@RequestParam String message) {
+//        kafkaProducer.send("user-created", message);
+//        return "Sent to Kafka: " + message;
+//    }
 
     @GetMapping("/welcome")
     public String welcome(){
