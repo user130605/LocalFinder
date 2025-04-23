@@ -4,7 +4,7 @@ import com.example.user_service.jpa.Role;
 import lombok.Data;
 
 @Data
-public class ResponseCreate {
+public class ResponseUser {
 
     private String email;
 

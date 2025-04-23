@@ -5,16 +5,20 @@ import com.example.review_service.dto.ReviewDto;
 import com.example.review_service.event.ReviewAddedEvent;
 import com.example.review_service.jpa.ReviewEntity;
 import com.example.review_service.jpa.ReviewRepository;
+import com.example.review_service.vo.RequestReviewUpdate;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
 public class ReviewServiceImpl implements ReviewService {
-    @Autowired
     ReviewRepository reviewRepository;
     KafkaProducer kafkaProducer;
 
@@ -48,28 +52,58 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewDto getReviewByPlaceId(int placeId) {
-        ReviewEntity reviewEntity = reviewRepository.findByPlaceId(placeId);
-
-        if (reviewEntity == null)
-            return null;
-
+    public List<ReviewDto> getReviewByPlaceId(int placeId) {
         ModelMapper mapper = new ModelMapper();
-        ReviewDto reviewDto = mapper.map(reviewEntity, ReviewDto.class);
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
-        return reviewDto;
+        List<ReviewEntity> reviewEntities = reviewRepository.findByPlaceId(placeId)
+                .orElseThrow(() -> new RuntimeException("해당 리뷰를 찾을 수 없습니다."));
+
+        List<ReviewDto> reviewDtos = new ArrayList<>();
+        for (ReviewEntity entity : reviewEntities) {
+            ReviewDto dto = mapper.map(entity, ReviewDto.class);
+            reviewDtos.add(dto);
+        }
+
+        return reviewDtos;
     }
 
     @Override
-    public ReviewDto getReviewByUserId(int userId) {
-        ReviewEntity userEntity = reviewRepository.findByUserId(userId);
-
-        if (userEntity == null)
-            return null;
-
+    public List<ReviewDto> getReviewByUserId(int userId) {
         ModelMapper mapper = new ModelMapper();
-        ReviewDto reviewDto = mapper.map(userEntity, ReviewDto.class);
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
-        return reviewDto;
+        List<ReviewEntity> reviewEntities = reviewRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("해당 리뷰를 찾을 수 없습니다."));
+
+        List<ReviewDto> reviewDtos = new ArrayList<>();
+        for (ReviewEntity entity : reviewEntities) {
+            ReviewDto dto = mapper.map(entity, ReviewDto.class);
+            reviewDtos.add(dto);
+        }
+
+        return reviewDtos;
+    }
+
+    @Override
+    @Transactional
+    public void updateReview(int reviewId, RequestReviewUpdate request) {
+        ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다."));
+
+        reviewEntity.setContent(request.getContent());
+        reviewEntity.setRating(request.getRating());
+
+        reviewRepository.save(reviewEntity);
+    }
+
+    @Override
+    @Transactional
+    public void deleteReview(int reviewId) {
+        ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 장소를 찾을 수 없습니다."));
+
+        reviewRepository.delete(reviewEntity);
+
     }
 }

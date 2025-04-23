@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -26,6 +27,21 @@ public class KafkaProducer {
                 log.info("Kafka message sent: {}", result.getProducerRecord().value());
             }
         });
+
+//        ListenableFuture<SendResult<String, Object>> future = kafkaTemplate.send("user-created", event);
+//
+//        future.addCallback(
+//                result -> log.info("✅ Kafka message sent: {}", result.getProducerRecord().value()),
+//                ex -> log.error("❌ Kafka message send failed: {}", ex.getMessage(), ex)
+//        );
+//
+//        future.whenComplete((result, ex) -> {
+//            if (ex != null) {
+//                log.error("Kafka message send failed: {}", ex.getMessage(), ex);
+//            } else {
+//                log.info("Kafka message sent: {}", result.getProducerRecord().value());
+//            }
+//        });
     }
 
 //    public void send(String topic, String message) {
