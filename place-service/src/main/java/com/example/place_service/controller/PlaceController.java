@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/place-service")
+@RequestMapping("/")
 public class PlaceController {
     PlaceService placeService;
     PlaceRepository placeRepository;

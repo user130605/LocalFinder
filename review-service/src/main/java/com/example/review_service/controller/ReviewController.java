@@ -2,7 +2,6 @@ package com.example.review_service.controller;
 
 import com.example.review_service.config.KafkaProducer;
 import com.example.review_service.dto.ReviewDto;
-import com.example.review_service.jpa.ReviewEntity;
 import com.example.review_service.jpa.ReviewRepository;
 import com.example.review_service.service.ReviewService;
 import com.example.review_service.vo.RequestReview;
@@ -19,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/review-service")
+@RequestMapping("/")
 public class ReviewController {
     private final KafkaProducer kafkaProducer;
     private ReviewService reviewService;
