@@ -7,12 +7,18 @@ import com.example.user_service.jpa.UserEntity;
 import com.example.user_service.jpa.UserRepository;
 import com.example.user_service.vo.RequestUserUpdate;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.math.raw.Mod;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
 
 @Service
 @Slf4j
@@ -20,6 +26,22 @@ public class UserServiceImpl implements UserService{
     UserRepository userRepository;
     KafkaProducer kafkaProducer;
     BCryptPasswordEncoder passwordEncoder;
+
+    // 사용자가 로그인을 시도할 때 호출돼.
+    // 예를 들어, /login으로 이메일(email)과 비밀번호(password)를 보내면,
+    // Spring Security가 이 메서드를 자동으로 호출해서 이메일로 사용자 정보를 조회한다.
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserEntity userEntity = userRepository.findByEmail(username)
+                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+
+        // Spring Security가 내부적으로 사용하는 User 객체를 만들어서 리턴
+        // 이 객체에 이메일, 비밀번호, 계정 활성화 여부, 권한 정보 등을 넘겨준다.
+        // 권한은 new ArrayList<>()로 비워져 있어서, 지금은 따로 역할(role) 체크를 하지 않는다.
+        return new User(userEntity.getEmail(), userEntity.getPassword(),
+                true, true, true, true,
+                new ArrayList<>());
+    }
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
@@ -53,33 +75,33 @@ public class UserServiceImpl implements UserService{
         return userDto;
     }
 
-    @Override
-    public UserDto getUserById(int userId) {
-        UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+//    @Override
+//    public UserDto getUserById(int userId) {
+//        UserEntity userEntity = userRepository.findById(userId)
+//                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+//
+//        if (userEntity == null)
+//            return null;
+//
+//        ModelMapper mapper = new ModelMapper();
+//        UserDto userDto = mapper.map(userEntity, UserDto.class);
+//
+//        return userDto;
+//    }
 
-        if (userEntity == null)
-            return null;
-
-        ModelMapper mapper = new ModelMapper();
-        UserDto userDto = mapper.map(userEntity, UserDto.class);
-
-        return userDto;
-    }
-
-    @Override
-    public UserDto getUserByEmail(String email) {
-        UserEntity userEntity = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
-
-        if (userEntity == null)
-            return null;
-
-        ModelMapper mapper = new ModelMapper();
-        UserDto userDto = mapper.map(userEntity, UserDto.class);
-
-        return userDto;
-    }
+//    @Override
+//    public UserDto getUserByEmail(String email) {
+//        UserEntity userEntity = userRepository.findByEmail(email)
+//                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+//
+//        if (userEntity == null)
+//            return null;
+//
+//        ModelMapper mapper = new ModelMapper();
+//        UserDto userDto = mapper.map(userEntity, UserDto.class);
+//
+//        return userDto;
+//    }
 
     @Override
     public UserDto login(String email, String password) {
@@ -117,5 +139,14 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
 
         userRepository.delete(userEntity);
+    }
+
+    @Override
+    public UserDto getUserDetailsByEmail(String email) {
+        UserEntity userEntity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+
+        UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
+        return userDto;
     }
 }

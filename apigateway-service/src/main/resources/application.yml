@@ -18,6 +18,15 @@ spring:
           uri: lb://USER-SERVICE
           predicates:
             - Path=/user-service/**
+            - Method=GET
+          filters:
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/**
+            - Method=POST
           filters:
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
         - id: place-service
@@ -32,3 +41,6 @@ spring:
             - Path=/review-service/**
           filters:
             - RewritePath=/review-service/(?<segment>.*), /$\{segment}
+
+token:
+  secret: "2jdfK@39f#sdklfj!O@8asdj8D3jf*o@sdnfa9WE@Sd839sjdlfjSD83sjdfL"
