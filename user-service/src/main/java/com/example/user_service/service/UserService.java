@@ -2,15 +2,14 @@ package com.example.user_service.service;
 
 import com.example.user_service.dto.UserDto;
 import com.example.user_service.vo.RequestUserUpdate;
-import jakarta.validation.Valid;
-import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
-public interface UserService {
-    public UserDto createUser(UserDto userDto);
-    public UserDto getUserById(int userId);
-    public UserDto getUserByEmail(String email);
+public interface UserService extends UserDetailsService {
+    UserDto createUser(UserDto userDto);
 
     UserDto login(String email, String password);
     void updateUser(int userId, RequestUserUpdate request);
     void deleteUser(int userId);
+
+    UserDto getUserDetailsByEmail(String userName);
 }

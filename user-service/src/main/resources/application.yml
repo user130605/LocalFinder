@@ -39,3 +39,11 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
+
+logging:
+  level:
+    com.example.userservice: DEBUG
+
+token:
+  expiration_time: 864000000
+  secret: "2jdfK@39f#sdklfj!O@8asdj8D3jf*o@sdnfa9WE@Sd839sjdlfjSD83sjdfL"
