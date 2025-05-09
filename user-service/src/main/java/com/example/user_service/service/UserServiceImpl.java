@@ -23,9 +23,19 @@ import java.util.ArrayList;
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService{
-    UserRepository userRepository;
-    KafkaProducer kafkaProducer;
-    BCryptPasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final KafkaProducer kafkaProducer;
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository,
+                           KafkaProducer kafkaProducer,
+                           BCryptPasswordEncoder passwordEncoder) {
+
+        this.userRepository = userRepository;
+        this.kafkaProducer = kafkaProducer;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     // 사용자가 로그인을 시도할 때 호출돼.
     // 예를 들어, /login으로 이메일(email)과 비밀번호(password)를 보내면,
@@ -41,16 +51,6 @@ public class UserServiceImpl implements UserService{
         return new User(userEntity.getEmail(), userEntity.getPassword(),
                 true, true, true, true,
                 new ArrayList<>());
-    }
-
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository,
-                           KafkaProducer kafkaProducer,
-                           BCryptPasswordEncoder passwordEncoder) {
-
-        this.userRepository = userRepository;
-        this.kafkaProducer = kafkaProducer;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -72,7 +72,8 @@ public class UserServiceImpl implements UserService{
 
         kafkaProducer.sendUserCreatedEvent(event);
 
-        return userDto;
+        UserDto returnDto = mapper.map(userEntity, UserDto.class);
+        return returnDto;
     }
 
 //    @Override

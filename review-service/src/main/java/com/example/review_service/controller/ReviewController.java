@@ -7,6 +7,13 @@ import com.example.review_service.service.ReviewService;
 import com.example.review_service.vo.RequestReview;
 import com.example.review_service.vo.RequestReviewUpdate;
 import com.example.review_service.vo.ResponseReview;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -17,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Tag(name = "Review")
 @RestController
 @RequestMapping("/")
 public class ReviewController {
@@ -30,7 +38,14 @@ public class ReviewController {
         this.reviewRepository = reviewRepository;
     }
 
-    // 리뷰 등록
+    @Operation(summary = "리뷰 등록", description = "리뷰 등록입니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "생성됨", content = {
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseReview.class))
+            })
+    })
     @PostMapping("/places/{placeId}/reviews")
     public ResponseEntity<ResponseReview> addReview(@RequestBody RequestReview requestReview){
         ModelMapper mapper = new ModelMapper();
@@ -44,7 +59,14 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseReview);
     }
 
-    // 리뷰 조회 (placeId)
+    @Operation(summary = "특정 장소 리뷰 조회", description = "특정 장소의 리뷰 목록을 조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공", content = {
+                    @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ResponseReview.class)))
+            })
+    })
     @GetMapping("/places/{placeId}/reviews")
     public ResponseEntity<List<ResponseReview>> getReviewsByPlace(@PathVariable int placeId){
         List<ReviewDto> reviewDtos = reviewService.getReviewByPlaceId(placeId);
@@ -60,7 +82,14 @@ public class ReviewController {
         return ResponseEntity.ok(result);
     }
 
-    // 리뷰 수정
+    @Operation(summary = "리뷰 수정", description = "리뷰 수정입니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공", content = {
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = String.class))
+            })
+    })
     @PatchMapping("/reviews/{reviewId}")
     public ResponseEntity<String> updateReview(@PathVariable int reviewId,
                                                @RequestBody @Valid RequestReviewUpdate request){
@@ -69,18 +98,18 @@ public class ReviewController {
         return ResponseEntity.ok("해당 리뷰가 수정되었습니다.");
     }
 
-    // 리뷰 삭제
+    @Operation(summary = "리뷰 삭제", description = "리뷰 삭제입니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공", content = {
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = String.class))
+            })
+    })
     @DeleteMapping("/reviews/{reviewId}")
     public ResponseEntity<String> deleteReview(@PathVariable int reviewId){
         reviewService.deleteReview(reviewId);
 
         return ResponseEntity.ok("해당 리뷰가 삭제되었습니다.");
     }
-
-    @GetMapping("/welcome")
-    public String welcome(){
-        return "review-service 입니다.";
-    }
-
-
 }

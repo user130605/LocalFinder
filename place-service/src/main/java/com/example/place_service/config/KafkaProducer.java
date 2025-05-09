@@ -17,10 +17,6 @@ public class KafkaProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-//    public void send(String topic, String message) {
-//        kafkaTemplate.send(topic, message);
-//    }
-
     public void sendPlaceCreatedEvent(PlaceCreatedEvent event) {
         CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send("place-created", event);
 

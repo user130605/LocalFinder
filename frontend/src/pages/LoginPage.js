@@ -1,7 +1,45 @@
 import { Container, Grid, TextField, Paper, Button, Typography, Box, Link as MuiLink } from "@mui/material";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import * as Yup from 'yup';
+import axios from 'axios';
+
+const validationSchema = Yup.object({
+  email: Yup.string().email('올바른 이메일 주소를 입력하세요').required('이메일을 입력하세요'),
+  password: Yup.string().min(4, '비밀번호는 최소 4자 이상이어야 합니다.').required('비밀번호를 입력하세요')
+});
 
 function LoginPage() {
+  const navigate = useNavigate();
+  const [values, setValues] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setErrors({ ...errors, [name]: '' });
+    setValues({ ...values, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await validationSchema.validate(values, { abortEarly: false });
+      const response = await axios.post('http://localhost:8000/user-service/login', values);
+      console.log('로그인 성공:', response.data);
+      navigate('/');
+    } catch (err) {
+      if (err.name === 'ValidationError') {
+        const errorMessages = {};
+        err.inner.forEach((error) => {
+          errorMessages[error.path] = error.message;
+        });
+        setErrors(errorMessages);
+      } else {
+        console.error('로그인 실패:', err.response?.data || err.message);
+      }
+    }
+  };
+
   return(
     <Container component="main" maxWidth="xs">
       <Paper
@@ -27,6 +65,10 @@ function LoginPage() {
                         name="email"
                         autoComplete='email'
                         autoFocus
+                        value={values.email}
+                        onChange={handleChange}
+                        error={Boolean(errors.email)}
+                        helperText={errors.email}
                     />
                 </Grid>
                 <Grid item sx={12}>
@@ -38,6 +80,10 @@ function LoginPage() {
                         name="password"
                         type='password'
                         autoComplete='password'
+                        value={values.password}
+                        onChange={handleChange}
+                        error={Boolean(errors.password)}
+                        helperText={errors.password}
                     />
                 </Grid>
             </Grid>
