@@ -16,7 +16,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.util.matcher.IpAddressMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.function.Supplier;
 
 @Configuration
@@ -51,16 +55,19 @@ public class WebSecurity {
         AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 
         // CSRF 비활성화 (JWT 방식에서는 세션 없이 처리하므로 필요 없음).
-        http.csrf( (csrf) -> csrf.disable());
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/", "/users/**").permitAll()
-                        .requestMatchers("/**").access(
-                                // WebExpressionAuthorizationManager : Spring Security에서 SEL(Security Expression Language)을 사용해 권한 제어를 하는 방식
-                                new WebExpressionAuthorizationManager(
-                                        "hasIpAddress('127.0.0.1') or hasIpAddress('::1') or " +
-                                                "hasIpAddress('125.191.69.94') or hasIpAddress('192.168.219.119')")) // host pc ip address
+                        .requestMatchers("/**").permitAll()
+//                        .requestMatchers("/**").access(
+//                                // WebExpressionAuthorizationManager : Spring Security에서 SEL(Security Expression Language)을 사용해 권한 제어를 하는 방식
+//                                new WebExpressionAuthorizationManager(
+//                                        "hasIpAddress('127.0.0.1') or hasIpAddress('::1') or " +
+//                                                "hasIpAddress('125.191.69.94') or hasIpAddress('192.168.219.119')")) // host pc ip address
                         .anyRequest().authenticated()
                 )
                 .authenticationManager(authenticationManager)
@@ -78,6 +85,20 @@ public class WebSecurity {
 //        http.addFilterBefore(new IpAddressLoggingFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+//        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://127.0.0.1:3000"));
+        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     private AuthorizationDecision hasIpAddress(Supplier<Authentication> authentication, RequestAuthorizationContext object) {

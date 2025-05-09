@@ -6,13 +6,19 @@ import { useNavigate } from 'react-router-dom';
 
 const validationSchema = Yup.object({
   email: Yup.string().email('올바른 이메일 주소를 입력하세요').required('이메일을 입력하세요'),
-  password: Yup.string().min(8, '비밀번호는 최소 8자 이상이어야 합니다.').required('비밀번호를 입력하세요'),
-  nickname: Yup.string().required('닉네임을 입력하세요')
+  password: Yup.string().min(4, '비밀번호는 최소 4자 이상이어야 합니다.').required('비밀번호를 입력하세요'),
+  nickname: Yup.string().required('닉네임을 입력하세요'),
+  role: Yup.string().oneOf(['customer', 'owner'], '회원 유형을 선택하세요').required('회원 유형을 선택하세요'),
 })
 
 const RegisterPage = () => {
   const navigation = useNavigate();
-  const [values, setValues] = useState({email: '', password: '', nickname: ''})
+  const [values, setValues] = useState({
+    email: '', 
+    password: '', 
+    nickname: '',
+    role: ''
+  })
   const [errors, setErrors] = useState({});
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,14 +35,16 @@ const RegisterPage = () => {
   const handleSubmit = async(e) => {
       e.preventDefault();
       await validationSchema.validate(values, { abortEarly : false}).then((valid) => {
-        axios.post('http://localhost:8000/user-service/create', values)
+        axios.post(`${process.env.REACT_APP_API_BASE_URL}/user-service/create`, values)
           .then(response => {
             console.log('회원가입 성공:', response.data);
-            navigation('/home');
+            navigation('/');
           })
           .catch(error => {
             console.error('회원가입 실패:', error);
           });
+        console.log(`${process.env.REACT_APP_API_BASE_URL}/user-service/create`);
+
       }).catch((err) => {
         console.log('err : ', err)
         const errorMessages = {};
@@ -78,7 +86,7 @@ const RegisterPage = () => {
                         autoFocus
                         value={values.email}
                         onChange={handleChange}
-                        onError={Boolean(errors.email)}
+                        error={Boolean(errors.email)}
                         helperText={errors.email}
                     />
                 </Grid>
@@ -93,7 +101,7 @@ const RegisterPage = () => {
                         autoComplete='password'
                         value={values.password}
                         onChange={handleChange}
-                        onError={Boolean(errors.password)}
+                        error={Boolean(errors.password)}
                         helperText={errors.password}
                     />
                 </Grid>
@@ -107,11 +115,40 @@ const RegisterPage = () => {
                         autoFocus
                         value={values.nickname}
                         onChange={handleChange}
-                        onError={Boolean(errors.nickname)}
+                        error={Boolean(errors.nickname)}
                         helperText={errors.nickname}
                     />
                 </Grid>
             </Grid>
+            <Grid item xs={12}>
+                <Typography variant="subtitle1" gutterBottom>
+                  회원 유형 선택
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item>
+                    <label>
+                      <input
+                        type="radio"
+                        name="role"
+                        value="customer"
+                        checked={values.role === 'customer'}
+                        onChange={handleChange}
+                      /> CUSTOMER
+                    </label>
+                  </Grid>
+                  <Grid item>
+                    <label>
+                      <input
+                        type="radio"
+                        name="role"
+                        value="owner"
+                        checked={values.role === 'owner'}
+                        onChange={handleChange}
+                      /> OWNER
+                    </label>
+                  </Grid>
+                </Grid>
+              </Grid>
             <Button
                 type='submit'
                 fullWidth
