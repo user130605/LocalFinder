@@ -11,11 +11,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class KafkaConsumer {
 
-//    @KafkaListener(topics = "user-created", groupId = "review-group")
-//    public void consume(String message) {
-//        log.info("Consumed message: {}", message);
-//    }
-
     @KafkaListener(topics = "user-created", groupId = "review-group", containerFactory = "userCreatedKafkaListenerContainerFactory")
     public void handleUserCreated(@Payload UserCreatedEvent event) {
         log.info("Kafka message received: id={}, name={}", event.getUserId(), event.getNickname());
