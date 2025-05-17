@@ -16,7 +16,7 @@
 | Backend    | Spring Boot, Spring Cloud, Spring Security |
 | Frontend   | React, React Router |
 | DB         | MySQL, JPA |
-| Infra      | Kafka, Eureka, Spring Cloud Gateway |
+| Infra      | Kafka, Eureka, Spring Cloud Gateway, docker |
 | Dev Tools  | IntelliJ, Insomnia, GitHub, Swagger |
 
 ---
